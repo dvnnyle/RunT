@@ -1,6 +1,7 @@
 import { ViewMode } from '../types';
 
 const SETTINGS_KEY = 'timer-device-settings';
+const SERVER_URL_KEY = 'timer-server-url';
 
 interface DeviceSettings {
   assignedRole: ViewMode | null;
@@ -36,5 +37,23 @@ export const clearDeviceSettings = (): void => {
     localStorage.removeItem(SETTINGS_KEY);
   } catch (e) {
     console.error('Failed to clear settings:', e);
+  }
+};
+
+export const getServerUrl = (): string => {
+  try {
+    const stored = localStorage.getItem(SERVER_URL_KEY);
+    return stored || 'http://localhost:3001';
+  } catch (e) {
+    console.error('Failed to load server URL:', e);
+    return 'http://localhost:3001';
+  }
+};
+
+export const saveServerUrl = (url: string): void => {
+  try {
+    localStorage.setItem(SERVER_URL_KEY, url);
+  } catch (e) {
+    console.error('Failed to save server URL:', e);
   }
 };

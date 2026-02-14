@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ViewMode } from '../types';
-import { getDeviceSettings, saveDeviceSettings, clearDeviceSettings } from '../utils/settings';
+import { getDeviceSettings, saveDeviceSettings, clearDeviceSettings, getServerUrl, saveServerUrl } from '../utils/settings';
 import { useTimer } from '../hooks/useTimer';
-import { IoSettingsSharp, IoCheckmark, IoClose, IoExpand, IoContract, IoExit, IoLockClosed, IoLockOpen, IoTrash } from 'react-icons/io5';
+import { IoSettingsSharp, IoCheckmark, IoClose, IoExpand, IoContract, IoExit, IoLockClosed, IoLockOpen, IoTrash, IoSave } from 'react-icons/io5';
 import './AdminSettings.css';
 
 interface AdminSettingsProps {
@@ -14,12 +14,14 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onClose, onRoleSet }) => 
   const [selectedRole, setSelectedRole] = useState<ViewMode | null>(null);
   const [isLocked, setIsLocked] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [serverUrl, setServerUrl] = useState('');
   const { connected, clientsCount } = useTimer();
 
   useEffect(() => {
     const settings = getDeviceSettings();
     setSelectedRole(settings.assignedRole);
     setIsLocked(settings.isLocked);
+    setServerUrl(getServerUrl());
     
     // Check fullscreen status
     if (window.api && window.api.isFullscreen) {
@@ -73,6 +75,19 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onClose, onRoleSet }) => 
         window.api.quitApp();
       }
     }
+  };
+
+  const handleSaveServerUrl = () => {
+    if (navigator.vibrate) navigator.vibrate(50);
+    
+    // Validate URL format
+    if (!serverUrl.startsWith('http://') && !serverUrl.startsWith('https://')) {
+      alert('⚠️ Server URL must start with http:// or https://');
+      return;
+    }
+    
+    saveServerUrl(serverUrl);
+    alert('✅ Server URL saved! Please restart the app to connect to the new server.');
   };
 
   return (
@@ -153,6 +168,36 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onClose, onRoleSet }) => 
                 </ul>
                 {selectedRole === 'display' && <div className="check-badge"><IoCheckmark className="checkmark" /></div>}
               </div>
+            </div>
+          </div>
+
+          <div className="settings-section">
+            <h2>Network Configuration</h2>
+            <p className="description">
+              Enter your server's IPv4 address. Find it by running <code>ipconfig</code> in command prompt (look for "IPv4 Address").
+            </p>
+            <div className="server-config">
+              <div className="input-group">
+                <label htmlFor="server-url">Server URL</label>
+                <input
+                  id="server-url"
+                  type="text"
+                  value={serverUrl}
+                  onChange={(e) => setServerUrl(e.target.value)}
+                  placeholder="http://192.168.1.100:3001"
+                  className="server-input"
+                />
+              </div>
+              <button 
+                className="btn-secondary admin-action-btn no-hover"
+                onClick={handleSaveServerUrl}
+              >
+                <IoSave size={20} />
+                <span style={{ marginLeft: '0.5rem' }}>Save Server URL</span>
+              </button>
+              <p className="hint-text">
+                💡 Example: <code>http://192.168.1.100:3001</code> (Use your IPv4 address)
+              </p>
             </div>
           </div>
 

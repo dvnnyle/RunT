@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { TimerState } from '../types';
-
-const SERVER_URL = 'http://localhost:3001';
+import { getServerUrl } from '../utils/settings';
 
 export const useTimer = () => {
   const [timerState, setTimerState] = useState<TimerState>({
@@ -19,8 +18,11 @@ export const useTimer = () => {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    // Connect to server
-    const socket = io(SERVER_URL, {
+    // Connect to server using saved URL
+    const serverUrl = getServerUrl();
+    console.log('🌐 Connecting to server:', serverUrl);
+    
+    const socket = io(serverUrl, {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 10

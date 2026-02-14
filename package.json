@@ -47,14 +47,20 @@
     "socket.io-client": "^4.8.3"
   },
   "build": {
-    "appId": "com.electron.tsx.app",
-    "productName": "Electron TSX App",
+    "appId": "com.dvnny.runt",
+    "productName": "RunT",
+    "icon": "src/logo.ico",
     "directories": {
       "output": "release"
     },
     "files": [
       "dist/**/*",
+      "server/**/*",
       "package.json"
-    ]
+    ],
+    "win": {
+      "target": ["portable", "nsis"],
+      "icon": "src/logo.ico"
+    }
   }
 }

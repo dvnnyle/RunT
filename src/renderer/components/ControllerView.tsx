@@ -32,6 +32,12 @@ const ControllerView: React.FC = () => {
     { label: '15 min', value: 900000 }
   ];
 
+  const triggerVibration = (duration: number) => {
+    if (navigator.vibrate) {
+      navigator.vibrate(duration);
+    }
+  };
+
   const handlePreset = (duration: number) => {
     setDuration(duration);
     if (!timerState.running) {
@@ -74,7 +80,10 @@ const ControllerView: React.FC = () => {
           {!timerState.running ? (
             <button 
               className="btn btn-start" 
-              onClick={() => startTimer()}
+              onClick={() => {
+                triggerVibration(50);
+                startTimer();
+              }}
               disabled={!connected}
             >
               ▶️ Start
@@ -82,7 +91,10 @@ const ControllerView: React.FC = () => {
           ) : (
             <button 
               className="btn btn-stop" 
-              onClick={stopTimer}
+              onClick={() => {
+                triggerVibration(100);
+                stopTimer();
+              }}
               disabled={!connected}
             >
               ⏸️ Stop

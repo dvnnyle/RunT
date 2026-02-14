@@ -3,7 +3,7 @@ import { useTimer } from '../hooks/useTimer';
 import './StartScreen.css';
 
 const StartScreen: React.FC = () => {
-  const { timerState, startTimer, connected, timeLeft } = useTimer();
+  const { timerState, startTimer, stopTimer, resetTimer, connected, timeLeft } = useTimer();
   const [countdown, setCountdown] = useState<number | null>(null);
 
   const formatTime = (ms: number): string => {
@@ -27,6 +27,12 @@ const StartScreen: React.FC = () => {
     }
     // Begin 3-2-1 countdown
     setCountdown(3);
+  };
+
+  const handleRestart = () => {
+    stopTimer();
+    resetTimer();
+    setCountdown(null);
   };
 
   const playBeep = (frequency: number) => {
@@ -87,6 +93,13 @@ const StartScreen: React.FC = () => {
             <div className="pulse-dot"></div>
             <h1>TIMER RUNNING</h1>
             <div className="running-timer">{formatTime(timeLeft)}</div>
+            <button
+              className="restart-button"
+              onClick={handleRestart}
+              disabled={!connected}
+            >
+              RESTART
+            </button>
           </div>
         )}
       </div>

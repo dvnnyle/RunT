@@ -7,5 +7,8 @@ contextBridge.exposeInMainWorld('api', {
   platform: process.platform,
   toggleFullscreen: () => ipcRenderer.invoke('toggle-fullscreen'),
   isFullscreen: () => ipcRenderer.invoke('is-fullscreen'),
-  quitApp: () => ipcRenderer.invoke('quit-app')
+  quitApp: () => ipcRenderer.invoke('quit-app'),
+  startServer: () => ipcRenderer.invoke('start-server'),
+  stopServer: () => ipcRenderer.invoke('stop-server'),
+  serverStatus: () => ipcRenderer.invoke('server-status')
 });

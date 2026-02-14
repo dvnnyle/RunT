@@ -78,6 +78,13 @@ const DisplayView: React.FC = () => {
     return '';
   };
 
+  const handleEmergencyStop = () => {
+    if (navigator.vibrate) {
+      navigator.vibrate(100);
+    }
+    stopTimer();
+  };
+
   return (
     <div className={`display-view ${getDisplayClass()} ${showFlash ? 'flash' : ''}`}>
       <div className="display-header">
@@ -121,7 +128,7 @@ const DisplayView: React.FC = () => {
         {timerState.running && (
           <button 
             className="emergency-stop" 
-            onClick={stopTimer}
+            onClick={handleEmergencyStop}
             disabled={!connected}
           >
             🛑 STOP

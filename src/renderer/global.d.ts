@@ -7,6 +7,9 @@ declare global {
       toggleFullscreen: () => Promise<boolean>;
       isFullscreen: () => Promise<boolean>;
       quitApp: () => Promise<void>;
+      startServer: () => Promise<boolean>;
+      stopServer: () => Promise<boolean>;
+      serverStatus: () => Promise<boolean>;
     };
   }
 }

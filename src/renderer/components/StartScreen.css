@@ -13,6 +13,7 @@
   top: 2rem;
   right: 2rem;
   font-size: 2rem;
+  z-index: 3;
 }
 
 .connection-status .connected {
@@ -36,45 +37,47 @@
 }
 
 .start-button {
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  border: 8px solid rgba(107, 122, 143, 0.6);
-  background: linear-gradient(135deg, rgba(26, 31, 46, 0.7) 0%, rgba(26, 31, 46, 0.9) 100%);
-  backdrop-filter: blur(20px);
-  color: #e0e6ed;
-  font-size: 6rem;
-  font-weight: 700;
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  color: #ff9800;
+  font-size: clamp(3.5rem, 12vw, 10rem);
+  font-weight: 900;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 
-    0 20px 80px rgba(107, 122, 143, 0.3),
-    inset 0 2px 4px rgba(160, 174, 192, 0.1);
-  text-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+  box-shadow: none;
+  text-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.45),
+    0 0 40px rgba(255, 152, 0, 0.55);
   font-family: 'Fira Mono', monospace;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.2em;
   touch-action: manipulation;
   user-select: none;
+  z-index: 1;
 }
 
-.start-button:hover:not(:disabled) {
-  transform: scale(1.05);
-  box-shadow: 
-    0 30px 100px rgba(107, 122, 143, 0.5),
-    inset 0 2px 4px rgba(160, 174, 192, 0.2);
-  border-width: 12px;
-  border-color: #6b7a8f;
-}
 
 .start-button:active:not(:disabled) {
-  transform: scale(0.95);
+  color: #fb8c00;
+  text-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.5),
+    0 0 35px rgba(251, 140, 0, 0.55);
 }
 
 .start-button:disabled {
   opacity: 0.3;
   cursor: not-allowed;
-  border-color: rgba(107, 122, 143, 0.2);
-  background: linear-gradient(135deg, rgba(26, 31, 46, 0.3) 0%, rgba(26, 31, 46, 0.4) 100%);
+  color: rgba(255, 152, 0, 0.35);
+  text-shadow: none;
+}
+
+.start-button:focus,
+.start-button:focus-visible {
+  outline: none;
 }
 
 .connection-message {
@@ -86,6 +89,7 @@
   font-size: 1.5rem;
   animation: fadeInOut 2s ease-in-out infinite;
   font-family: 'Fira Mono', monospace;
+  z-index: 3;
 }
 
 @keyframes fadeInOut {
@@ -163,6 +167,35 @@
   margin-top: 1rem;
 }
 
+.restart-button {
+  margin-top: 4rem;
+  padding: 1rem 2.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  border-radius: 16px;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  background: rgba(10, 14, 23, 0.6);
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-shadow: none;
+  box-shadow: none;
+  font-family: 'Fira Mono', monospace;
+  letter-spacing: 0.08em;
+}
+
+
+.restart-button:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.restart-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 /* Screen Credit Footer */
 .screen-credit {
   position: fixed;
@@ -196,9 +229,7 @@
 /* Tablet optimizations */
 @media (max-width: 1024px) {
   .start-button {
-    width: 400px;
-    height: 400px;
-    font-size: 4.5rem;
+    font-size: clamp(3rem, 14vw, 8rem);
   }
   
   .countdown-number {
@@ -208,15 +239,16 @@
 
 @media (max-width: 768px) {
   .start-button {
-    width: 70vw;
-    height: 70vw;
-    max-width: 350px;
-    max-height: 350px;
-    font-size: 3.5rem;
+    font-size: clamp(2.5rem, 16vw, 6rem);
   }
   
   .running-indicator h1 {
     font-size: 2.5rem;
+  }
+
+  .restart-button {
+    font-size: 1.5rem;
+    padding: 0.8rem 2rem;
   }
 
   .screen-credit {

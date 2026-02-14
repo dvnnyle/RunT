@@ -1,8 +1,43 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
+import { fork, ChildProcess } from 'child_process';
 
 let mainWindow: BrowserWindow | null = null;
 let canClose = false;
+let serverProcess: ChildProcess | null = null;
+
+const startLocalServer = (): boolean => {
+  if (serverProcess) {
+    return true;
+  }
+
+  try {
+    const serverPath = path.join(app.getAppPath(), 'server', 'index.js');
+    serverProcess = fork(serverPath, [], {
+      stdio: 'pipe'
+    });
+
+    serverProcess.on('exit', () => {
+      serverProcess = null;
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    serverProcess = null;
+    return false;
+  }
+};
+
+const stopLocalServer = (): boolean => {
+  if (!serverProcess) {
+    return false;
+  }
+
+  serverProcess.kill();
+  serverProcess = null;
+  return true;
+};
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -85,9 +120,24 @@ ipcMain.handle('quit-app', async () => {
   app.quit();
 });
 
+ipcMain.handle('start-server', async () => {
+  return startLocalServer();
+});
+
+ipcMain.handle('stop-server', async () => {
+  return stopLocalServer();
+});
+
+ipcMain.handle('server-status', async () => {
+  return !!serverProcess;
+});
+
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
+  if (serverProcess) {
+    stopLocalServer();
+  }
   if (process.platform !== 'darwin') {
     app.quit();
   }

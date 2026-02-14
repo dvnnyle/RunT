@@ -93,7 +93,7 @@
   background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
   color: #ffffff;
   font-size: 8rem;
-  font-weight: 700;
+  font-weight: 900;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: inset 0 -4px 8px rgba(0, 0, 0, 0.2);
@@ -104,9 +104,6 @@
   user-select: none;
 }
 
-.stop-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #fb8c00 0%, #ef6c00 100%);
-}
 
 .stop-button:active:not(:disabled) {
   background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);

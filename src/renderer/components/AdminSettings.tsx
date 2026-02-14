@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ViewMode } from '../types';
-import { getDeviceSettings, saveDeviceSettings, clearDeviceSettings, getServerUrl, saveServerUrl } from '../utils/settings';
+import { getDeviceSettings, saveDeviceSettings, clearDeviceSettings, getServerUrl, saveServerUrl, getHostServer, saveHostServer, getDeviceName } from '../utils/settings';
 import { useTimer } from '../hooks/useTimer';
-import { IoSettingsSharp, IoCheckmark, IoClose, IoExpand, IoContract, IoExit, IoLockClosed, IoLockOpen, IoTrash, IoSave } from 'react-icons/io5';
+import { IoSettingsSharp, IoCheckmark, IoClose, IoExpand, IoContract, IoExit, IoLockClosed, IoLockOpen, IoTrash, IoSave, IoPower } from 'react-icons/io5';
 import './AdminSettings.css';
 
 interface AdminSettingsProps {
@@ -15,18 +15,31 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onClose, onRoleSet }) => 
   const [isLocked, setIsLocked] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [serverUrl, setServerUrl] = useState('');
-  const { connected, clientsCount } = useTimer();
+  const [hostServer, setHostServer] = useState(false);
+  const [serverRunning, setServerRunning] = useState(false);
+  const { connected, clientsCount, devices, registerDevice } = useTimer();
+
+  const sideADevices = devices.filter((device) => device.role === 'controller');
+  const sideBDevices = devices.filter((device) => device.role === 'display');
+  const unassignedDevices = devices.filter((device) => !device.role);
 
   useEffect(() => {
     const settings = getDeviceSettings();
     setSelectedRole(settings.assignedRole);
     setIsLocked(settings.isLocked);
     setServerUrl(getServerUrl());
+    setHostServer(getHostServer());
     
     // Check fullscreen status
     if (window.api && window.api.isFullscreen) {
       window.api.isFullscreen().then((fullscreen: boolean) => {
         setIsFullscreen(fullscreen);
+      });
+    }
+
+    if (window.api && window.api.serverStatus) {
+      window.api.serverStatus().then((running: boolean) => {
+        setServerRunning(running);
       });
     }
   }, []);
@@ -40,6 +53,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onClose, onRoleSet }) => 
         assignedRole: selectedRole,
         isLocked: true
       });
+      registerDevice(getDeviceName(), selectedRole);
       onRoleSet(selectedRole);
       alert('✅ Device role saved! App will boot directly to this role.');
       onClose();
@@ -88,6 +102,27 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onClose, onRoleSet }) => 
     
     saveServerUrl(serverUrl);
     alert('✅ Server URL saved! Please restart the app to connect to the new server.');
+  };
+
+  const handleToggleServer = async () => {
+    if (navigator.vibrate) navigator.vibrate(50);
+
+    if (!window.api || !window.api.startServer || !window.api.stopServer) {
+      alert('⚠️ Server controls are not available');
+      return;
+    }
+
+    if (serverRunning) {
+      const stopped = await window.api.stopServer();
+      setServerRunning(!stopped);
+      setHostServer(false);
+      saveHostServer(false);
+    } else {
+      const started = await window.api.startServer();
+      setServerRunning(started);
+      setHostServer(started);
+      saveHostServer(started);
+    }
   };
 
   return (
@@ -169,6 +204,57 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onClose, onRoleSet }) => 
                 {selectedRole === 'display' && <div className="check-badge"><IoCheckmark className="checkmark" /></div>}
               </div>
             </div>
+
+            <div className="role-assignments">
+              <div className="assignment-card">
+                <h4>Side A (Start)</h4>
+                <ul>
+                  {sideADevices.length > 0 ? sideADevices.map((device) => (
+                    <li key={device.id}>{device.name}</li>
+                  )) : (
+                    <li className="empty">No device assigned</li>
+                  )}
+                </ul>
+              </div>
+              <div className="assignment-card">
+                <h4>Side B (Stop)</h4>
+                <ul>
+                  {sideBDevices.length > 0 ? sideBDevices.map((device) => (
+                    <li key={device.id}>{device.name}</li>
+                  )) : (
+                    <li className="empty">No device assigned</li>
+                  )}
+                </ul>
+              </div>
+              <div className="assignment-card">
+                <h4>Unassigned</h4>
+                <ul>
+                  {unassignedDevices.length > 0 ? unassignedDevices.map((device) => (
+                    <li key={device.id}>{device.name}</li>
+                  )) : (
+                    <li className="empty">None</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+
+            <div className="devices-list">
+              <h4>Devices Connected</h4>
+              <div className="devices-list-grid">
+                {devices.length > 0 ? devices.map((device) => (
+                  <div key={device.id} className="device-chip">
+                    <span className="device-name">{device.name}</span>
+                    <span className={`device-role ${device.role || 'unassigned'}`}>
+                      {device.role === 'controller' ? 'Side A' :
+                       device.role === 'display' ? 'Side B' :
+                       'Unassigned'}
+                    </span>
+                  </div>
+                )) : (
+                  <div className="device-empty">No devices connected yet</div>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="settings-section">
@@ -198,6 +284,21 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onClose, onRoleSet }) => 
               <p className="hint-text">
                 💡 Example: <code>http://192.168.1.100:3001</code> (Use your IPv4 address)
               </p>
+              <div className="server-host">
+                <div className="server-host-status">
+                  <span className={`status-dot ${serverRunning ? 'connected' : 'disconnected'}`}></span>
+                  <span>{serverRunning ? 'Local server running' : 'Local server stopped'}</span>
+                </div>
+                <button
+                  className="btn-secondary admin-action-btn"
+                  onClick={handleToggleServer}
+                >
+                  <IoPower size={20} />
+                  <span style={{ marginLeft: '0.5rem' }}>
+                    {serverRunning ? 'Stop Local Server' : 'Start Local Server'}
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
 

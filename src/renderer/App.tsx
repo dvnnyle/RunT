@@ -5,8 +5,7 @@ import StopScreen from './components/StopScreen';
 import AdminSettings from './components/AdminSettings';
 import PinEntry from './components/PinEntry';
 import { ViewMode } from './types';
-import { getDeviceSettings } from './utils/settings';
-import { useTimer } from './hooks/useTimer';
+import { getDeviceSettings, getHostServer } from './utils/settings';
 import './App.css';
 
 const App: React.FC = () => {
@@ -16,7 +15,6 @@ const App: React.FC = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const [longPressProgress, setLongPressProgress] = useState(0);
-  const { timerState } = useTimer();
 
   // Load saved role on mount
   useEffect(() => {
@@ -26,6 +24,13 @@ const App: React.FC = () => {
       setViewMode(settings.assignedRole);
     }
     setIsInitialized(true);
+  }, []);
+
+  // Auto-start local server if enabled
+  useEffect(() => {
+    if (getHostServer() && window.api && window.api.startServer) {
+      window.api.startServer();
+    }
   }, []);
 
   // Keyboard shortcut: Ctrl+Shift+A to open admin
@@ -169,18 +174,16 @@ const App: React.FC = () => {
       </div>
 
       {/* Settings Island - Bottom left corner */}
-      {!timerState.running && (
-        <button 
-          className="settings-island"
-          onClick={() => {
-            if (navigator.vibrate) navigator.vibrate(30);
-            setShowPinEntry(true);
-          }}
-          title="Device Settings"
-        >
-          <IoSettingsSharp size={24} />
-        </button>
-      )}
+      <button 
+        className="settings-island"
+        onClick={() => {
+          if (navigator.vibrate) navigator.vibrate(30);
+          setShowPinEntry(true);
+        }}
+        title="Device Settings"
+      >
+        <IoSettingsSharp size={24} />
+      </button>
 
       {showPinEntry && (
         <PinEntry

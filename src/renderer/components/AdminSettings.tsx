@@ -91,6 +91,17 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onClose, onRoleSet }) => 
     }
   };
 
+  const handleReloadApp = () => {
+    if (navigator.vibrate) navigator.vibrate(50);
+    if (confirm('Reload the app to apply new settings?')) {
+      if (window.api && window.api.relaunchApp) {
+        window.api.relaunchApp();
+      } else {
+        window.location.reload();
+      }
+    }
+  };
+
   const handleSaveServerUrl = () => {
     if (navigator.vibrate) navigator.vibrate(50);
     
@@ -349,6 +360,13 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onClose, onRoleSet }) => 
             <div className="action-section">
               <h3 className="section-title">System Actions</h3>
               <div className="button-row">
+                <button
+                  className="btn-secondary"
+                  onClick={handleReloadApp}
+                >
+                  <IoPower size={20} />
+                  <span style={{ marginLeft: '0.5rem' }}>Reload App</span>
+                </button>
                 <button 
                   className="btn-danger"
                   onClick={handleClear}

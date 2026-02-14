@@ -102,6 +102,20 @@
   background: radial-gradient(ellipse at center, #1a1f2e 0%, #0a0e17 50%, #000000 100%);
 }
 
+.start-screen.finished {
+  background: radial-gradient(ellipse at center, #1f2a35 0%, #141f2a 50%, #0a0e17 100%);
+  animation: finishFlash 0.5s ease;
+}
+
+@keyframes finishFlash {
+  0%, 100% {
+    background: radial-gradient(ellipse at center, #1f2a35 0%, #141f2a 50%, #0a0e17 100%);
+  }
+  50% {
+    background: radial-gradient(ellipse at center, #2a3a45 0%, #1f2a35 50%, #141f2a 100%);
+  }
+}
+
 .countdown-overlay {
   display: flex;
   align-items: center;
@@ -196,6 +210,43 @@
   box-shadow: none;
 }
 
+.final-time-display {
+  text-align: center;
+  animation: slideUp 0.6s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.stopped-label {
+  color: #e0e6ed;
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0 0 2rem 0;
+  letter-spacing: 0.2em;
+  opacity: 0.9;
+  font-family: 'Fira Mono', monospace;
+}
+
+.final-time {
+  font-size: 18vw;
+  font-weight: 700;
+  color: #ff9800;
+  font-family: 'Fira Mono', monospace;
+  letter-spacing: 0.1em;
+  text-shadow: 0 10px 50px rgba(255, 152, 0, 0.5);
+  margin: 2rem 0;
+  line-height: 1;
+}
+
 /* Screen Credit Footer */
 .screen-credit {
   position: fixed;
@@ -259,5 +310,9 @@
 
   .screen-credit .credit-text {
     font-size: 0.7rem;
+  }
+
+  .stopped-label {
+    font-size: 2rem;
   }
 }

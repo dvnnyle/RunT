@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTimer } from '../hooks/useTimer';
 import './StopScreen.css';
 
@@ -6,10 +6,11 @@ const StopScreen: React.FC = () => {
   const { timerState, timeLeft, stopTimer, connected } = useTimer();
   const [finalTime, setFinalTime] = useState<string | null>(null);
   const [showFinished, setShowFinished] = useState(false);
+  const wasRunning = useRef(false);
 
   const formatTime = (ms: number): string => {
-    // Count upwards from 0
-    const elapsed = 60000 - ms; // 60 seconds total
+    const totalDuration = timerState.duration || 60000;
+    const elapsed = Math.max(0, totalDuration - ms);
     const totalSeconds = Math.floor(elapsed / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
@@ -68,6 +69,22 @@ const StopScreen: React.FC = () => {
       setFinalTime(null);
     }
   }, [timerState.running, timerState.paused]);
+
+  useEffect(() => {
+    if (timerState.running) {
+      wasRunning.current = true;
+      return;
+    }
+
+    if (!timerState.running && !timerState.paused) {
+      wasRunning.current = false;
+    }
+
+    if (wasRunning.current && timerState.paused && !showFinished) {
+      setFinalTime(formatTime(timeLeft));
+      setShowFinished(true);
+    }
+  }, [timerState.running, timerState.paused, timeLeft, showFinished]);
 
   // Auto-reset after 15 seconds on finished screen
   useEffect(() => {

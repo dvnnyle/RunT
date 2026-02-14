@@ -120,6 +120,12 @@ ipcMain.handle('quit-app', async () => {
   app.quit();
 });
 
+ipcMain.handle('relaunch-app', async () => {
+  canClose = true;
+  app.relaunch();
+  app.exit(0);
+});
+
 ipcMain.handle('start-server', async () => {
   return startLocalServer();
 });

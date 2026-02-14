@@ -31,12 +31,12 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [timerState, setTimerState] = useState<TimerState>({
     running: false,
     endTime: null,
-    duration: 60000,
+    duration: 600000,
     paused: false,
-    remainingTime: 60000
+    remainingTime: 600000
   });
 
-  const [timeLeft, setTimeLeft] = useState<number>(60000);
+  const [timeLeft, setTimeLeft] = useState<number>(600000);
   const [connected, setConnected] = useState<boolean>(false);
   const [clientsCount, setClientsCount] = useState<number>(0);
   const [countdownValue, setCountdownValue] = useState<number | null>(null);

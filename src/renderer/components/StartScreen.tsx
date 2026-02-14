@@ -1,14 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTimer } from '../hooks/useTimer';
 import './StartScreen.css';
 
 const StartScreen: React.FC = () => {
-  const { timerState, startTimer, stopTimer, resetTimer, connected, timeLeft } = useTimer();
-  const [countdown, setCountdown] = useState<number | null>(null);
+  const {
+    timerState,
+    stopTimer,
+    resetTimer,
+    startCountdown,
+    clearCountdown,
+    countdownValue,
+    connected,
+    timeLeft
+  } = useTimer();
+  const [finalTime, setFinalTime] = useState<string | null>(null);
+  const [showFinished, setShowFinished] = useState(false);
+  const wasRunning = useRef(false);
 
   const formatTime = (ms: number): string => {
-    // Count upwards from 0
-    const elapsed = 60000 - ms; // 60 seconds total
+    const totalDuration = timerState.duration || 60000;
+    const elapsed = Math.max(0, totalDuration - ms);
     const totalSeconds = Math.floor(elapsed / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
@@ -25,14 +36,15 @@ const StartScreen: React.FC = () => {
     if (navigator.vibrate) {
       navigator.vibrate(50);
     }
-    // Begin 3-2-1 countdown
-    setCountdown(3);
+    if (!timerState.running && countdownValue === null) {
+      startCountdown();
+    }
   };
 
   const handleRestart = () => {
     stopTimer();
     resetTimer();
-    setCountdown(null);
+    clearCountdown();
   };
 
   const playBeep = (frequency: number) => {
@@ -58,25 +70,62 @@ const StartScreen: React.FC = () => {
   };
 
   useEffect(() => {
-    if (countdown === null) return;
+    if (countdownValue === null) return;
 
-    // Play beep when countdown changes
-    if (countdown > 0) {
-      playBeep(800); // 3, 2, 1
-      const timer = setTimeout(() => {
-        setCountdown(countdown - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
+    if (countdownValue > 0) {
+      playBeep(800);
     } else {
-      playBeep(1200); // GO (higher pitch)
-      // Countdown finished, start the actual timer
-      startTimer(60000); // Default 1 minute, can be adjusted
-      setCountdown(null);
+      playBeep(1200);
     }
-  }, [countdown, startTimer]);
+  }, [countdownValue]);
+
+  useEffect(() => {
+    if (timerState.running) {
+      wasRunning.current = true;
+      return;
+    }
+
+    if (!timerState.running && !timerState.paused) {
+      wasRunning.current = false;
+    }
+
+    if (wasRunning.current && timerState.paused) {
+      setFinalTime(formatTime(timeLeft));
+      setShowFinished(true);
+    }
+  }, [timerState.running, timerState.paused, timeLeft]);
+
+  useEffect(() => {
+    if (timerState.running && !timerState.paused) {
+      setShowFinished(false);
+      setFinalTime(null);
+    }
+  }, [timerState.running, timerState.paused]);
+
+  useEffect(() => {
+    if (showFinished) {
+      const resetTimerId = setTimeout(() => {
+        setShowFinished(false);
+        setFinalTime(null);
+      }, 15000);
+
+      return () => clearTimeout(resetTimerId);
+    }
+  }, [showFinished]);
+
+  if (showFinished && finalTime) {
+    return (
+      <div className="start-screen finished">
+        <div className="final-time-display">
+          <h1 className="stopped-label">STOPPED AT</h1>
+          <div className="final-time">{finalTime}</div>
+        </div>
+      </div>
+    );
+  }
 
   // If timer is already running, show running state
-  if (timerState.running || countdown !== null) {
+  if (timerState.running || countdownValue !== null) {
     return (
       <div className="start-screen running">
         <div className="connection-status">
@@ -84,9 +133,9 @@ const StartScreen: React.FC = () => {
             {connected ? '●' : '○'}
           </span>
         </div>
-        {countdown !== null ? (
+        {countdownValue !== null ? (
           <div className="countdown-overlay">
-            <div className="countdown-number">{countdown}</div>
+            <div className="countdown-number">{countdownValue}</div>
           </div>
         ) : (
           <div className="running-indicator">

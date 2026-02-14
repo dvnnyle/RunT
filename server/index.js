@@ -15,12 +15,14 @@ const io = new Server(server, {
 });
 
 // Timer state
+const MAX_DURATION = 10 * 60 * 1000;
+
 let timerState = {
   running: false,
   endTime: null,
-  duration: 60000, // 60 seconds default
+  duration: MAX_DURATION,
   paused: false,
-  remainingTime: 60000
+  remainingTime: MAX_DURATION
 };
 
 // Track connected clients
@@ -34,6 +36,32 @@ const devices = new Map();
 const emitDevicesUpdate = () => {
   const list = Array.from(devices.values());
   io.emit('devices-update', list);
+};
+
+const normalizeDuration = (duration) => {
+  const value = Number(duration);
+  if (!Number.isFinite(value) || value <= 0) {
+    return null;
+  }
+  return Math.min(value, MAX_DURATION);
+};
+
+const startTimer = (duration) => {
+  const normalized = normalizeDuration(duration);
+  if (normalized) {
+    timerState.duration = normalized;
+    timerState.remainingTime = normalized;
+  } else if (timerState.duration > MAX_DURATION) {
+    timerState.duration = MAX_DURATION;
+    timerState.remainingTime = Math.min(timerState.remainingTime, MAX_DURATION);
+  }
+
+  timerState.running = true;
+  timerState.paused = false;
+  timerState.endTime = Date.now() + timerState.remainingTime;
+
+  console.log(`Timer started: ${timerState.duration}ms`);
+  io.emit('timer-state', timerState);
 };
 
 io.on('connection', (socket) => {
@@ -88,6 +116,9 @@ io.on('connection', (socket) => {
       if (countdownValue <= 0) {
         clearInterval(countdownTimer);
         countdownTimer = null;
+        if (!timerState.running) {
+          startTimer();
+        }
         setTimeout(() => {
           countdownValue = null;
           io.emit('countdown', countdownValue);
@@ -107,17 +138,7 @@ io.on('connection', (socket) => {
 
   // Start timer
   socket.on('start-timer', (duration) => {
-    if (duration) {
-      timerState.duration = duration;
-      timerState.remainingTime = duration;
-    }
-    
-    timerState.running = true;
-    timerState.paused = false;
-    timerState.endTime = Date.now() + timerState.remainingTime;
-    
-    console.log(`Timer started: ${timerState.duration}ms`);
-    io.emit('timer-state', timerState);
+    startTimer(duration);
   });
 
   // Stop timer
@@ -146,12 +167,17 @@ io.on('connection', (socket) => {
 
   // Set duration
   socket.on('set-duration', (duration) => {
-    timerState.duration = duration;
+    const normalized = normalizeDuration(duration);
+    if (!normalized) {
+      return;
+    }
+
+    timerState.duration = normalized;
     if (!timerState.running) {
-      timerState.remainingTime = duration;
+      timerState.remainingTime = normalized;
     }
     
-    console.log(`Duration set to: ${duration}ms`);
+    console.log(`Duration set to: ${normalized}ms`);
     io.emit('timer-state', timerState);
   });
 

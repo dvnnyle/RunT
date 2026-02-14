@@ -23,13 +23,13 @@ const ControllerView: React.FC = () => {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const maxMinutes = 10;
   const presetDurations = [
     { label: '30 sec', value: 30000 },
     { label: '1 min', value: 60000 },
     { label: '2 min', value: 120000 },
     { label: '5 min', value: 300000 },
-    { label: '10 min', value: 600000 },
-    { label: '15 min', value: 900000 }
+    { label: '10 min', value: 600000 }
   ];
 
   const triggerVibration = (duration: number) => {
@@ -46,7 +46,7 @@ const ControllerView: React.FC = () => {
   };
 
   const handleCustomDuration = () => {
-    const duration = customMinutes * 60000;
+    const duration = Math.min(Math.max(customMinutes, 1), maxMinutes) * 60000;
     setDuration(duration);
     if (!timerState.running) {
       resetTimer();
@@ -132,7 +132,7 @@ const ControllerView: React.FC = () => {
           <input
             type="number"
             min="1"
-            max="60"
+            max="10"
             value={customMinutes}
             onChange={(e) => setCustomMinutes(parseInt(e.target.value) || 1)}
             disabled={!connected || timerState.running}

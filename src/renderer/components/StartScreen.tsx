@@ -42,9 +42,9 @@ const StartScreen: React.FC = () => {
   };
 
   const handleRestart = () => {
-    stopTimer();
     resetTimer();
-    clearCountdown();
+    setShowFinished(false);
+    setFinalTime(null);
   };
 
   const playBeep = (frequency: number) => {
@@ -105,20 +105,36 @@ const StartScreen: React.FC = () => {
   useEffect(() => {
     if (showFinished) {
       const resetTimerId = setTimeout(() => {
+        resetTimer();
         setShowFinished(false);
         setFinalTime(null);
-      }, 15000);
+      }, 10000);
 
       return () => clearTimeout(resetTimerId);
     }
   }, [showFinished]);
 
+  useEffect(() => {
+    const duration = timerState.duration || 60000;
+    if (showFinished && !timerState.running && !timerState.paused && timeLeft === duration) {
+      setShowFinished(false);
+      setFinalTime(null);
+    }
+  }, [showFinished, timerState.running, timerState.paused, timeLeft, timerState.duration]);
+
   if (showFinished && finalTime) {
     return (
       <div className="start-screen finished">
         <div className="final-time-display">
-          <h1 className="stopped-label">STOPPED AT</h1>
+          <h1 className="stopped-label">Din Tid</h1>
           <div className="final-time">{finalTime}</div>
+          <button
+            className="restart-button"
+            onClick={handleRestart}
+            disabled={!connected}
+          >
+            RESTART
+          </button>
         </div>
       </div>
     );
@@ -140,7 +156,7 @@ const StartScreen: React.FC = () => {
         ) : (
           <div className="running-indicator">
             <div className="pulse-dot"></div>
-            <h1>TIMER RUNNING</h1>
+            <h1>TIDTAKER PÅGÅR</h1>
             <div className="running-timer">{formatTime(timeLeft)}</div>
             <button
               className="restart-button"
@@ -162,13 +178,15 @@ const StartScreen: React.FC = () => {
           {connected ? '●' : '○'}
         </span>
       </div>
+
+      <div className="start-pulse-ring"></div>
       
       <button 
         className="start-button"
         onClick={handleStart}
         disabled={!connected}
       >
-        START
+        <span className="start-label">START</span>
       </button>
 
       {!connected && (

@@ -3,7 +3,9 @@ import { useTimer } from '../hooks/useTimer';
 import './StopScreen.css';
 
 const StopScreen: React.FC = () => {
-  const { timerState, timeLeft, stopTimer, connected } = useTimer();
+  const { timerState, timeLeft, stopTimer, resetTimer, countdownValue, connected } = useTimer();
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [showCountdownOverlay, setShowCountdownOverlay] = useState(false);
   const [finalTime, setFinalTime] = useState<string | null>(null);
   const [showFinished, setShowFinished] = useState(false);
   const wasRunning = useRef(false);
@@ -55,6 +57,15 @@ const StopScreen: React.FC = () => {
     }
   };
 
+  const handleRestart = () => {
+    resetTimer();
+    setShowFinished(false);
+    setFinalTime(null);
+    setShowCountdownOverlay(false);
+    setCountdown(null);
+    wasRunning.current = false;
+  };
+
   // Auto-stop when timer reaches 0
   useEffect(() => {
     if (timeLeft === 0 && timerState.running) {
@@ -88,23 +99,78 @@ const StopScreen: React.FC = () => {
 
   // Auto-reset after 15 seconds on finished screen
   useEffect(() => {
+    let interval: NodeJS.Timeout;
+    let timeout: NodeJS.Timeout;
     if (showFinished) {
-      const resetTimer = setTimeout(() => {
+      setCountdown(10);
+      setShowCountdownOverlay(true);
+      interval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev && prev > 1) {
+            return prev - 1;
+          } else {
+            return 0;
+          }
+        });
+      }, 1000);
+      timeout = setTimeout(() => {
+        resetTimer();
         setShowFinished(false);
         setFinalTime(null);
-      }, 15000);
-
-      return () => clearTimeout(resetTimer);
+        setShowCountdownOverlay(false);
+      }, 10000);
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    } else {
+      setShowCountdownOverlay(false);
+      setCountdown(null);
     }
   }, [showFinished]);
+
+  useEffect(() => {
+    const duration = timerState.duration || 600000;
+    if (showFinished && !timerState.running && !timerState.paused && timeLeft === duration) {
+      setShowFinished(false);
+      setFinalTime(null);
+      setShowCountdownOverlay(false);
+      setCountdown(null);
+    }
+  }, [showFinished, timerState.running, timerState.paused, timeLeft, timerState.duration]);
 
   // Show finished state with final time
   if (showFinished && finalTime) {
     return (
       <div className="stop-screen finished">
         <div className="final-time-display">
-          <h1 className="stopped-label">STOPPED AT</h1>
+          <h1 className="stopped-label">Din Tid</h1>
           <div className="final-time">{finalTime}</div>
+          <button
+            className="stop-restart-button"
+            onClick={handleRestart}
+            disabled={!connected}
+          >
+            RESTART
+          </button>
+          {showCountdownOverlay && countdown !== null && (
+            <div className="finished-countdown">går tilbake om {countdown}</div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (countdownValue !== null) {
+    return (
+      <div className="stop-screen active">
+        <div className="connection-status">
+          <span className={connected ? 'connected' : 'disconnected'}>
+            {connected ? '●' : '○'}
+          </span>
+        </div>
+        <div className="countdown-overlay">
+          <div className="countdown-number">{countdownValue}</div>
         </div>
       </div>
     );
@@ -121,7 +187,10 @@ const StopScreen: React.FC = () => {
         </div>
         <div className="waiting-message">
           <div className="pulse-ring"></div>
-          <h1>WAITING FOR START</h1>
+          <h1>Klar til start</h1>
+          <div className="waiting-subtext">
+            Trykk <span className="start-word">START</span> på andre siden
+          </div>
         </div>
       </div>
     );

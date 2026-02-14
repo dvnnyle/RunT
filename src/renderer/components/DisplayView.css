@@ -1,0 +1,261 @@
+.display-view {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.display-view.flash {
+  animation: flashBg 0.5s ease-in-out;
+}
+
+@keyframes flashBg {
+  0%, 100% {
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  }
+  50% {
+    background: linear-gradient(135deg, #ff0000 0%, #ff4444 50%, #ff0000 100%);
+  }
+}
+
+.display-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.connection-indicator {
+  font-size: 2rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.connection-indicator.connected {
+  color: #4caf50;
+}
+
+.connection-indicator.disconnected {
+  color: #f44336;
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0.3; }
+}
+
+.display-mode {
+  font-size: 1.2rem;
+  opacity: 0.7;
+}
+
+.timer-display-large {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.countdown {
+  font-size: 15vw;
+  font-weight: 900;
+  font-family: 'Arial Black', 'Arial Bold', Arial, sans-serif;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  line-height: 1;
+  animation: scaleIn 0.3s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.display-view.warning .countdown {
+  color: #ff9800;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.display-view.finished .countdown {
+  color: #f44336;
+  animation: shake 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-20px);
+  }
+  75% {
+    transform: translateX(20px);
+  }
+}
+
+.finished-message {
+  position: absolute;
+  top: 20%;
+  width: 100%;
+  text-align: center;
+  animation: bounceIn 0.6s ease;
+}
+
+.finished-message h1 {
+  font-size: 4rem;
+  margin: 0;
+  text-shadow: 0 5px 30px rgba(255, 0, 0, 0.8);
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.waiting-message {
+  font-size: 3rem;
+  opacity: 0.6;
+  margin-top: 2rem;
+  animation: fadeInOut 2s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.display-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.status-indicator {
+  flex: 1;
+}
+
+.status {
+  font-size: 1.8rem;
+  font-weight: 600;
+  padding: 1rem 2rem;
+  border-radius: 20px;
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.status.running {
+  background: rgba(76, 175, 80, 0.3);
+  border: 2px solid #4caf50;
+  color: #4caf50;
+}
+
+.status.paused {
+  background: rgba(255, 152, 0, 0.3);
+  border: 2px solid #ff9800;
+  color: #ff9800;
+}
+
+.status.finished {
+  background: rgba(244, 67, 54, 0.3);
+  border: 2px solid #f44336;
+  color: #f44336;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.status.stopped {
+  background: rgba(158, 158, 158, 0.3);
+  border: 2px solid #9e9e9e;
+  color: #9e9e9e;
+}
+
+.emergency-stop {
+  padding: 1.5rem 3rem;
+  font-size: 2rem;
+  font-weight: 900;
+  border: 4px solid #f44336;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  touch-action: manipulation;
+  user-select: none;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.emergency-stop:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+  transform: scale(1.05);
+  box-shadow: 0 10px 40px rgba(244, 67, 54, 0.5);
+}
+
+.emergency-stop:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.emergency-stop:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .display-view {
+    padding: 1rem;
+  }
+  
+  .countdown {
+    font-size: 20vw;
+  }
+  
+  .finished-message h1 {
+    font-size: 2.5rem;
+  }
+  
+  .emergency-stop {
+    font-size: 1.5rem;
+    padding: 1rem 2rem;
+  }
+}
+
+@media (orientation: landscape) {
+  .countdown {
+    font-size: 20vh;
+  }
+}

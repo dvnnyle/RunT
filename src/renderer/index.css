@@ -1,0 +1,23 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Fira Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #0a0e17;
+  color: #e0e6ed;
+  margin: 0;
+}
+
+code {
+  font-family: 'Fira Mono', monospace;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+}

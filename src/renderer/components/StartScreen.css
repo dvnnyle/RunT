@@ -1,0 +1,231 @@
+.start-screen {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at top, #1a1f2e 0%, #0a0e17 50%, #000000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.connection-status {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  font-size: 2rem;
+}
+
+.connection-status .connected {
+  color: #4caf50;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.connection-status .disconnected {
+  color: #f44336;
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0.2; }
+}
+
+.start-button {
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  border: 8px solid rgba(107, 122, 143, 0.6);
+  background: linear-gradient(135deg, rgba(26, 31, 46, 0.7) 0%, rgba(26, 31, 46, 0.9) 100%);
+  backdrop-filter: blur(20px);
+  color: #e0e6ed;
+  font-size: 6rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 20px 80px rgba(107, 122, 143, 0.3),
+    inset 0 2px 4px rgba(160, 174, 192, 0.1);
+  text-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  font-family: 'Fira Mono', monospace;
+  letter-spacing: 0.1em;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.start-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 
+    0 30px 100px rgba(107, 122, 143, 0.5),
+    inset 0 2px 4px rgba(160, 174, 192, 0.2);
+  border-width: 12px;
+  border-color: #6b7a8f;
+}
+
+.start-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.start-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  border-color: rgba(107, 122, 143, 0.2);
+  background: linear-gradient(135deg, rgba(26, 31, 46, 0.3) 0%, rgba(26, 31, 46, 0.4) 100%);
+}
+
+.connection-message {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #cbd5e0;
+  font-size: 1.5rem;
+  animation: fadeInOut 2s ease-in-out infinite;
+  font-family: 'Fira Mono', monospace;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Running state */
+.start-screen.running {
+  background: radial-gradient(ellipse at center, #1a1f2e 0%, #0a0e17 50%, #000000 100%);
+}
+
+.countdown-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.countdown-number {
+  font-size: 35vw;
+  font-weight: 700;
+  color: #e0e6ed;
+  text-shadow: 0 10px 50px rgba(107, 122, 143, 0.5);
+  font-family: 'Fira Mono', monospace;
+}
+
+
+
+.running-indicator {
+  text-align: center;
+}
+
+.pulse-dot {
+  width: 150px;
+  height: 150px;
+  background: #ff9800;
+  border-radius: 50%;
+  margin: 0 auto 3rem auto;
+  box-shadow: 0 0 50px rgba(255, 152, 0, 0.6);
+  animation: pulseDot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.7;
+  }
+}
+
+
+
+.running-indicator h1 {
+  color: #e0e6ed;
+  font-size: 4rem;
+  font-weight: 700;
+  margin: 0 0 2rem 0;
+  letter-spacing: 0.1em;
+  text-shadow: 0 5px 30px rgba(107, 122, 143, 0.5);
+  font-family: 'Fira Mono', monospace;
+}
+
+.running-timer {
+  color: #a0aec0;
+  font-size: 5rem;
+  font-weight: 700;
+  font-family: 'Fira Mono', monospace;
+  letter-spacing: 0.1em;
+  text-shadow: 0 5px 30px rgba(107, 122, 143, 0.5);
+  margin-top: 1rem;
+}
+
+/* Screen Credit Footer */
+.screen-credit {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Fira Mono', monospace;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 1rem;
+  background: rgba(10, 14, 23, 0.6);
+  border: 1px solid rgba(107, 122, 143, 0.2);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  z-index: 100;
+}
+
+.screen-credit .credit-text {
+  color: #6b7a8f;
+  font-size: 0.8rem;
+}
+
+.screen-credit .credit-link {
+  color: #ff9800;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+/* Tablet optimizations */
+@media (max-width: 1024px) {
+  .start-button {
+    width: 400px;
+    height: 400px;
+    font-size: 4.5rem;
+  }
+  
+  .countdown-number {
+    font-size: 40vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .start-button {
+    width: 70vw;
+    height: 70vw;
+    max-width: 350px;
+    max-height: 350px;
+    font-size: 3.5rem;
+  }
+  
+  .running-indicator h1 {
+    font-size: 2.5rem;
+  }
+
+  .screen-credit {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    bottom: 0.75rem;
+  }
+
+  .screen-credit .credit-text {
+    font-size: 0.7rem;
+  }
+}
